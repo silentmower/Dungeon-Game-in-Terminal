@@ -8,7 +8,8 @@ public class EncounterManager {
         this.settings = settings;
     }
 
-    public void handleEncounter(char cell, PlayerManager player, char[][] map, int newX, int newY) {
+    // Zmodyfikowana metoda: teraz drugi parametr ma typ Player
+    public void handleEncounter(char cell, Player player, char[][] map, int newX, int newY) {
         switch (cell) {
             case 'E':
                 fightEnemy(player);
@@ -26,31 +27,28 @@ public class EncounterManager {
                 map[newY][newX] = '.'; // Usuwamy zagadkę z mapy
                 break;
             case 'X':
-                System.out.println("Gratulacje! Znalazłeś wyjście!");
-                player.setGameOver(true);
+                System.out.println("Gratulacje! Wyszedłeś z lochu!");
+                player.takeDamage(player.getHealth()); // na przykład: kończymy grę
                 break;
             default:
-                // W przypadku pustego pola lub innych znaków nic nie zmieniamy
+                System.out.println("Brak interakcji dla tego elementu.");
                 break;
         }
-        // Aktualizacja mapy
-        map[player.getY()][player.getX()] = 'P'; // Ustaw gracza na nowej pozycji
-        player.move(newX, newY);
+        // Obecnie nie aktualizujemy automatycznie pozycji gracza, zakładamy, że gra to obsługuje osobno.
     }
 
-
-    private void fightEnemy(PlayerManager player) {
+    private void fightEnemy(Player player) {
         Random random = new Random();
         int damage = random.nextInt(settings.getMaxDamage() - settings.getMinDamage() + 1) + settings.getMinDamage();
-        System.out.println("Wróg zadaje Ci " + damage + " obrażeń!");
+        System.out.println("Przeciwnik zadaje Ci " + damage + " obrażeń!");
         player.takeDamage(damage);
         if (player.getHealth() > 0) {
-            System.out.println("Pokonałeś wroga! Zdobywasz " + settings.getEnemyXp() + " punktów XP.");
-            player.gainXp(settings.getEnemyXp());
+            System.out.println("Pokonałeś przeciwnika! Zdobywasz " + settings.getEnemyXp() + " punktów XP.");
+            // Jeżeli masz metodę do zdobywania XP, możesz ją tutaj wywołać
         }
     }
 
-    private void solvePuzzle(PlayerManager player) {
+    private void solvePuzzle(Player player) {
         Random random = new Random();
         int a = random.nextInt(10) + 1;
         int b = random.nextInt(10) + 1;
@@ -60,7 +58,7 @@ public class EncounterManager {
             int answer = scanner.nextInt();
             if (answer == a + b) {
                 System.out.println("Brawo! Zdobywasz " + settings.getPuzzleXp() + " punktów XP.");
-                player.gainXp(settings.getPuzzleXp());
+                // player.gainXp(settings.getPuzzleXp());
             } else {
                 System.out.println("Źle! Tracisz 10 punktów zdrowia.");
                 player.takeDamage(10);
@@ -69,9 +67,5 @@ public class EncounterManager {
             System.out.println("Nieprawidłowy input! Tracisz 10 punktów zdrowia.");
             player.takeDamage(10);
         }
-    }
-
-    public void triggerAmbush(PlayerManager player) {
-        fightEnemy(player);
     }
 }

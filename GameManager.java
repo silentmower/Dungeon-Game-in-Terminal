@@ -1,151 +1,218 @@
+import java.util.Random;
 import java.util.Scanner;
 
 public class GameManager {
-    private MapGenerator mapGenerator;
-    private PlayerManager playerManager;
-    private EncounterManager encounterManager;
     private char[][] map;
+    private int mapWidth;
+    private int mapHeight;
+    private Player player;
+    private EncounterManager encounterManager;
+    private DifficultySettings difficultySettings;
 
     public GameManager() {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.println("Witaj w Dungeon Adventure!");
-
-        // Wybór rozmiaru mapy
-        System.out.println("Podaj wielkość mapy (od 5 do 10, np. 7 dla mapy 7x7):");
-        int size = 0;
+        // WYBÓR ROZMIARU MAPY:
+        System.out.println("Podaj rozmiar mapy (liczba z zakresu 5-10, mapa będzie kwadratowa):");
+        int size = 7;
         while (true) {
             try {
                 size = scanner.nextInt();
-                scanner.nextLine(); // Czyszczenie bufora wejścia
-
                 if (size >= 5 && size <= 10) {
                     break;
                 } else {
-                    System.out.println("Nieprawidłowy rozmiar! Wprowadź wartość w zakresie 5-10.");
+                    System.out.println("Niepoprawny rozmiar, podaj liczbę od 5 do 10:");
                 }
             } catch (Exception e) {
-                System.out.println("Nieprawidłowe dane! Wprowadź liczbę całkowitą od 5 do 10.");
-                scanner.nextLine(); // Czyszczenie bufora wejścia
+                System.out.println("Należy podać liczbę całkowitą.");
+                scanner.next(); // czyszczenie bufora
             }
         }
+        mapWidth = size;
+        mapHeight = size;
 
-        // Wybór poziomu trudności
-        System.out.println("Wybierz poziom trudności:");
-        System.out.println("1. Łatwy");
-        System.out.println("2. Średni");
-        System.out.println("3. Trudny");
-        int difficulty = scanner.nextInt();
-        scanner.nextLine(); // Czyszczenie bufora wejścia
-        System.out.println("Wybrano poziom: " + difficulty);
-
-        DifficultySettings settings = DifficultySettings.getSettings(difficulty);
-        this.mapGenerator = new MapGenerator();
-        this.playerManager = new PlayerManager();
-        this.encounterManager = new EncounterManager(settings);
-
-        // Generowanie mapy o podanych wymiarach (np. 7x7)
-        this.map = mapGenerator.generateMap(size, size);
-    }
-
-    public void startGame() {
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Instrukcje:");
-        System.out.println("- Poruszanie: 'w', 'a', 's', 'd'");
-        System.out.println("- Ruch o wiele pól: np. '2a' (dwa pola w lewo)");
-        System.out.println("- Używanie przedmiotu: 'u <nazwa>'");
-        System.out.println("- Sprawdzenie ekwipunku: 'i'");
-
-        while (!playerManager.isGameOver()) {
-            displayMap();
-            System.out.println("Zdrowie: " + playerManager.getHealth() + " | XP: " + playerManager.getXp());
-            System.out.println("Podaj swoją akcję:");
-            String action = scanner.nextLine();
-
-            if (action.startsWith("u ")) {
-                String itemName = action.substring(2);
-                playerManager.useItem(itemName);
-            } else if (action.equals("i")) {
-                playerManager.showInventory();
-            } else {
-                processMove(action);
+        // WYBÓR POZIOMU TRUDNOŚCI:
+        System.out.println("Wybierz poziom trudności (1 – Łatwy, 2 – Średni, 3 – Trudny):");
+        int diffChoice = 2;
+        while (true) {
+            try {
+                diffChoice = scanner.nextInt();
+                if (diffChoice >= 1 && diffChoice <= 3) {
+                    break;
+                } else {
+                    System.out.println("Nieprawidłowy wybór, podaj 1, 2 lub 3:");
+                }
+            } catch (Exception e) {
+                System.out.println("Należy podać liczbę całkowitą.");
+                scanner.next(); // czyszczenie bufora
             }
         }
-        System.out.println("Koniec gry! Zdobyte XP: " + playerManager.getXp());
-        scanner.close();
+        scanner.nextLine(); // konsumujemy znak nowej linii
+        difficultySettings = DifficultySettings.getSettings(diffChoice);
+
+        // Inicjalizacja mapy
+        map = new char[mapHeight][mapWidth];
+        generateMap();
+
+        // Inicjalizacja gracza – umieszczamy gracza na pozycji (0,0)
+        player = new Player("player1", "Filip", 100, 15);
+        map[0][0] = 'P';
+
+        // Inicjalizacja EncounterManagera z wybranymi ustawieniami trudności
+        encounterManager = new EncounterManager(difficultySettings);
     }
 
+    // Generuje mapę losowo. Na każdym polu (poza pozycjami startowymi) losuje:
+    // 10% - przedmiot ('I'), kolejne 10% - przeciwnik ('E'), następne 10% - zagadka ('?')
+    // pozostałe 70% to puste pole ('.'). Wyjście ustalamy jako 'X' w prawym dolnym rogu.
+    private void generateMap() {
+        Random random = new Random();
+        for (int i = 0; i < mapHeight; i++) {
+            for (int j = 0; j < mapWidth; j++) {
+                // Rezerwacja pola startowego i wyjścia
+                if ((i == 0 && j == 0) || (i == mapHeight - 1 && j == mapWidth - 1)) {
+                    map[i][j] = '.';
+                } else {
+                    int chance = random.nextInt(100);
+                    if (chance < 10) {
+                        map[i][j] = 'I';
+                    } else if (chance < 20) {
+                        map[i][j] = 'E';
+                    } else if (chance < 30) {
+                        map[i][j] = '?';
+                    } else {
+                        map[i][j] = '.';
+                    }
+                }
+            }
+        }
+        // Ustalenie wyjścia – dolny prawy róg
+        map[mapHeight - 1][mapWidth - 1] = 'X';
+    }
+
+    // Wyświetla mapę w konsoli
     private void displayMap() {
-        for (char[] row : map) {
-            for (char cell : row) {
-                System.out.print(cell + " ");
+        for (int i = 0; i < mapHeight; i++) {
+            for (int j = 0; j < mapWidth; j++) {
+                System.out.print(map[i][j] + " ");
             }
             System.out.println();
         }
     }
 
-    private void processMove(String action) {
-        // Ustal liczbę kroków oraz kierunek ruchu
-        int steps = 1;
-        char direction;
-        if (action.length() > 1 && Character.isDigit(action.charAt(0))) {
-            steps = Character.getNumericValue(action.charAt(0));
-            direction = action.charAt(1);
-        } else {
-            direction = action.charAt(0);
-        }
-
-        int startX = playerManager.getX();
-        int startY = playerManager.getY();
-        boolean interrupted = false;
-        int currentX = startX;
-        int currentY = startY;
-
-        for (int step = 1; step <= steps; step++) {
-            int newX = startX;
-            int newY = startY;
-
-            switch (direction) {
-                case 'w':
-                    newY = startY - step;
-                    break;
-                case 's':
-                    newY = startY + step;
-                    break;
-                case 'a':
-                    newX = startX - step;
-                    break;
-                case 'd':
-                    newX = startX + step;
-                    break;
-                default:
-                    System.out.println("Nieprawidłowy kierunek!");
-                    return;
+    // Znajduje współrzędną X gracza (szukamy symbolu 'P')
+    private int getPlayerX() {
+        for (int i = 0; i < mapHeight; i++) {
+            for (int j = 0; j < mapWidth; j++) {
+                if (map[i][j] == 'P') {
+                    return j;
+                }
             }
+        }
+        return -1;
+    }
 
-            if (newX < 0 || newX >= map[0].length || newY < 0 || newY >= map.length) {
-                System.out.println("Nie możesz się tam ruszyć!");
+    // Znajduje współrzędną Y gracza
+    private int getPlayerY() {
+        for (int i = 0; i < mapHeight; i++) {
+            for (int j = 0; j < mapWidth; j++) {
+                if (map[i][j] == 'P') {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    // Główna pętla gry
+    public void startGame() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            displayMap();
+            System.out.println("Zdrowie gracza: " + player.getHealth() + " | XP: " + player.getXp());
+            System.out.println("Podaj komendę: (np. w, s, a, d – ruch; np. 2d – ruch o 2 pola; i - ekwipunek; q - wyjście)");
+            String command = scanner.nextLine().trim().toLowerCase();
+
+            if (command.equals("i")) {
+                player.showInventory();
+                continue;
+            }
+            if (command.equals("q")) {
+                System.out.println("Gra zakończona!");
+                scanner.close();
                 return;
             }
 
-            char cell = map[newY][newX];
-            if (cell != '.' && cell != 'P') {
-                encounterManager.handleEncounter(cell, playerManager, map, newX, newY);
-                interrupted = true;
-                break;
+            int steps = 1;
+            char moveDir = ' ';
+            // Jeśli komenda ma więcej niż jeden znak i początek to cyfra,
+            // interpretujemy ją jako ruch wielokrokowy.
+            if (command.length() > 1 && java.lang.Character.isDigit(command.charAt(0))) {
+                steps = java.lang.Character.getNumericValue(command.charAt(0));
+                moveDir = command.charAt(1);
+            } else if (command.length() == 1 && "wasd".indexOf(command.charAt(0)) != -1) {
+                moveDir = command.charAt(0);
+            } else {
+                System.out.println("Nieznana komenda!");
+                continue;
             }
 
-            currentX = newX;
-            currentY = newY;
+            int currentX = getPlayerX();
+            int currentY = getPlayerY();
+            int newX = currentX;
+            int newY = currentY;
+            boolean interrupted = false;
+
+            // Wykonujemy ruch krok po kroku
+            for (int i = 0; i < steps; i++) {
+                switch (moveDir) {
+                    case 'w': newY--; break;
+                    case 's': newY++; break;
+                    case 'a': newX--; break;
+                    case 'd': newX++; break;
+                    default:
+                        System.out.println("Nieznany kierunek!");
+                        interrupted = true;
+                        break;
+                }
+                if (interrupted) break;
+
+                // Sprawdzamy, czy nie wychodzimy poza granice mapy
+                if (newX < 0 || newX >= mapWidth || newY < 0 || newY >= mapHeight) {
+                    System.out.println("Nie możesz się tam ruszyć! Granica mapy.");
+                    newX = currentX;
+                    newY = currentY;
+                    interrupted = true;
+                    break;
+                }
+
+                // Jeśli trafiamy na wyjście 'X', kończymy grę
+                if (map[newY][newX] == 'X') {
+                    System.out.println("Gratulacje! Wyszedłeś z lochu!");
+                    scanner.close();
+                    return;
+                }
+
+                // Jeśli napotkamy interaktywny element (przeciwnik, przedmiot, zagadka)
+                if (map[newY][newX] == 'E' || map[newY][newX] == 'I' || map[newY][newX] == '?') {
+                    encounterManager.handleEncounter(map[newY][newX], player, map, newX, newY);
+                    interrupted = true;
+                    break;
+                }
+            }
+
+            // Jeżeli ruch nie został przerwany, aktualizujemy pozycję gracza
+            if (!interrupted) {
+                map[currentY][currentX] = '.';
+                map[newY][newX] = 'P';
+            }
+
+            // Jeżeli zdrowie gracza spadło do zera, kończymy grę
+            if (player.isGameOver()) {
+                System.out.println("Przegrałeś!");
+                scanner.close();
+                return;
+            }
         }
-
-        int finalX = currentX; // Poprawiamy ostatni krok ruchu
-        int finalY = currentY; // Poprawiamy ostatni krok ruchu
-
-        map[startY][startX] = '.';
-        map[finalY][finalX] = 'P';
-        playerManager.move(finalX, finalY);
     }
 }
-

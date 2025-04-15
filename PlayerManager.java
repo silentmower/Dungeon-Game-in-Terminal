@@ -89,9 +89,11 @@ public class PlayerManager {
 
     public int[] calculateMove(String action) {
         int dx = 0, dy = 0;
-        if (action.length() > 1 && Character.isDigit(action.charAt(0))) {
-            int steps = Character.getNumericValue(action.charAt(0));
-            char direction = action.charAt(1);
+
+        // Sprawdzenie, czy pierwszy znak jest cyfrą
+        if (action.length() > 1 && java.lang.Character.isDigit(action.charAt(0))) {
+            int steps = java.lang.Character.getNumericValue(action.charAt(0)); // Pobieramy liczbę kroków z pierwszego znaku
+            char direction = action.charAt(1); // Pobieramy kierunek z drugiego znaku
             switch (direction) {
                 case 'w': dy = -steps; break;
                 case 's': dy = steps; break;
@@ -102,6 +104,7 @@ public class PlayerManager {
                     break;
             }
         } else {
+            // Jeśli pierwszy znak nie jest cyfrą, interpretujemy tylko kierunek
             switch (action) {
                 case "w": dy = -1; break;
                 case "s": dy = 1; break;
@@ -112,6 +115,8 @@ public class PlayerManager {
                     break;
             }
         }
+
+        // Zwracamy nowe współrzędne gracza
         return new int[] { x + dx, y + dy };
     }
 
