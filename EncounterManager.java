@@ -1,71 +1,83 @@
 import java.util.Random;
 import java.util.Scanner;
 
+// Klasa EncounterManager zarządza interakcjami gracza z elementami mapy (przeciwnicy, przedmioty, zagadki)
 public class EncounterManager {
-    private DifficultySettings settings;
+    private DifficultySettings settings;  // Ustawienia trudności wpływające na interakcje, np. obrażenia, XP
 
+    // Konstruktor inicjalizujący EncounterManager z podanymi ustawieniami trudności
     public EncounterManager(DifficultySettings settings) {
-        this.settings = settings;
+        this.settings = settings;         // Ustawia konfigurację trudności
     }
 
-    // Zmodyfikowana metoda: teraz drugi parametr ma typ Player
+    /* Metoda handleEncounter obsługuje interakcje gracza z elementami mapy.
+       Przyjmuje:
+         - 'cell': symbol napotkanego elementu (np. 'E', 'I', '?', 'X'),
+         - 'player': obiekt gracza,
+         - 'map': mapę gry (tablica znaków),
+         - 'newX', 'newY': współrzędne, gdzie nastąpiła interakcja. */
     public void handleEncounter(char cell, Player player, char[][] map, int newX, int newY) {
         switch (cell) {
-            case 'E':
-                fightEnemy(player);
+            case 'E':  // Jeśli napotkano przeciwnika
+                fightEnemy(player);  // Używa metody walki z przeciwnikiem
                 System.out.println("Pokonałeś przeciwnika!");
-                map[newY][newX] = '.'; // Usuwamy przeciwnika z mapy
+                map[newY][newX] = '.';  // Usuwa przeciwnika z mapy, zamieniając symbol na pusty
                 break;
-            case 'I':
+            case 'I':  // Jeśli napotkano przedmiot (tutaj miksturę zdrowia)
                 System.out.println("Znalazłeś przedmiot! Mikstura zdrowia.");
-                player.addItem(new Item("Health Potion", 25));
-                map[newY][newX] = '.'; // Usuwamy przedmiot z mapy
+                // Instancja konkretnej mikstury, np. małej mikstury zdrowia (SmallHealthPotion)
+                player.addItem(new SmallHealthPotion());
+                map[newY][newX] = '.';  // Usuwa przedmiot z mapy
                 break;
-            case '?':
-                solvePuzzle(player);
+            case '?':  // Jeśli napotkano zagadkę
+                solvePuzzle(player);  // Wywołuje metodę rozwiązującą zagadkę
                 System.out.println("Rozwiązałeś zagadkę!");
-                map[newY][newX] = '.'; // Usuwamy zagadkę z mapy
+                map[newY][newX] = '.';  // Usuwa zagadkę z mapy
                 break;
-            case 'X':
-                System.out.println("Gratulacje! Wyszedłeś z lochu!");
-                player.takeDamage(player.getHealth()); // na przykład: kończymy grę
+            case 'X':  // Jeśli napotkano wyjście (choć zwykle obsługiwane oddzielnie)
+                System.out.println("Gratulacje! Udało ci się wyjść z lochu!");
+                // Przykładowo: kończymy grę poprzez ustalenie, że gracz traci całe zdrowie
+                player.takeDamage(player.getHealth());
                 break;
-            default:
+            default:  // Obsługa sytuacji, gdy nie ma zdefiniowanej interakcji dla danego elementu
                 System.out.println("Brak interakcji dla tego elementu.");
                 break;
         }
-        // Obecnie nie aktualizujemy automatycznie pozycji gracza, zakładamy, że gra to obsługuje osobno.
     }
 
+    // Metoda symulująca walkę z przeciwnikiem
     private void fightEnemy(Player player) {
-        Random random = new Random();
+        Random random = new Random();  // Tworzy obiekt Random do losowania obrażeń
+        // Losuje obrażenia w zakresie ustawionym w DifficultySettings, np. między minDamage a maxDamage
         int damage = random.nextInt(settings.getMaxDamage() - settings.getMinDamage() + 1) + settings.getMinDamage();
         System.out.println("Przeciwnik zadaje Ci " + damage + " obrażeń!");
-        player.takeDamage(damage);
+        player.takeDamage(damage);  // Zadaje graczowi obrażenia
+        // Jeśli gracz nadal żyje, przyznaje punkty doświadczenia
         if (player.getHealth() > 0) {
             System.out.println("Pokonałeś przeciwnika! Zdobywasz " + settings.getEnemyXp() + " punktów XP.");
-            // Jeżeli masz metodę do zdobywania XP, możesz ją tutaj wywołać
+            player.gainXp(settings.getEnemyXp());
         }
     }
 
+    // Metoda rozwiązująca zagadkę – prosta matematyczna zagadka
     private void solvePuzzle(Player player) {
-        Random random = new Random();
-        int a = random.nextInt(10) + 1;
-        int b = random.nextInt(10) + 1;
+        Random random = new Random();  // Tworzy obiekt Random do generacji liczb
+        int a = random.nextInt(10) + 1;  // Losuje pierwszą liczbę z zakresu 1-10
+        int b = random.nextInt(10) + 1;  // Losuje drugą liczbę z zakresu 1-10
         System.out.println("Rozwiąż zagadkę: Ile wynosi " + a + " + " + b + " ?");
-        Scanner scanner = new Scanner(System.in);
+        Scanner scanner = new Scanner(System.in); // Tworzy Scanner do pobierania odpowiedzi gracza
         try {
-            int answer = scanner.nextInt();
-            if (answer == a + b) {
+            int answer = scanner.nextInt();  // Odczytuje odpowiedź gracza
+            if (answer == a + b) {           // Sprawdza poprawność odpowiedzi
                 System.out.println("Brawo! Zdobywasz " + settings.getPuzzleXp() + " punktów XP.");
-                // player.gainXp(settings.getPuzzleXp());
+                player.gainXp(settings.getPuzzleXp());  // Przyznaje graczowi XP
             } else {
                 System.out.println("Źle! Tracisz 10 punktów zdrowia.");
-                player.takeDamage(10);
+                player.takeDamage(10);       // Kara w postaci utraty zdrowia za błędną odpowiedź
             }
-        } catch (Exception e) {
+        } catch (Exception e) {              // Obsługuje błędy podczas pobierania odpowiedzi
             System.out.println("Nieprawidłowy input! Tracisz 10 punktów zdrowia.");
-            player.takeDamage(10);
+            player.takeDamage(10);           // Kara w postaci obrażeń
         }
     }
 }

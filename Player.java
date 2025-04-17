@@ -96,4 +96,11 @@ public class Player extends Character {
     public boolean isGameOver() {
         return this.health <= 0;
     }
+    public void heal(int amount) {
+        this.health += amount;                    // Zwiększa stan zdrowia o podaną wartość
+        if(this.health > 100) {                     // Sprawdza, czy zdrowie przekracza maksymalny limit
+            this.health = 100;                      // Ustawia zdrowie na 100, jeśli wartość jest większa
+        }
+        System.out.println(name + " odzyskał " + amount + " punktów zdrowia."); // Informacja dla gracza
+    }
 }
