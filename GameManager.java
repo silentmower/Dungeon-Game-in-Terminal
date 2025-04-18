@@ -128,91 +128,93 @@ public class GameManager {
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            displayMap();
+            displayMap(); // Wyświetla aktualną mapę
             System.out.println("Zdrowie gracza: " + player.getHealth() + " | XP: " + player.getXp());
-            System.out.println("Podaj komendę: (np. w, s, a, d – ruch; np. 2d – ruch o 2 pola; i - ekwipunek; q - wyjście)");
-            String command = scanner.nextLine().trim().toLowerCase();
+            System.out.println("Podaj komendę: (np. w, s, a, d – ruch; 2d – ruch o 2 pola; i - ekwipunek; q - wyjście)");
+            String command = scanner.nextLine().trim().toLowerCase(); // Pobiera i przetwarza komendę od gracza
 
             if (command.equals("i")) {
-                player.showInventory();
+                player.showInventory(); // Wyświetla ekwipunek
                 continue;
             }
             if (command.equals("q")) {
                 System.out.println("Gra zakończona!");
-                scanner.close();
+                scanner.close(); // Zamyka Scanner
                 return;
             }
 
-            int steps = 1;
-            char moveDir = ' ';
-            // Jeśli komenda ma więcej niż jeden znak i początek to cyfra,
-            // interpretujemy ją jako ruch wielokrokowy.
+            int steps = 1; // Domyślna liczba kroków (ruch o jedno pole)
+            char moveDir = ' '; // Kierunek ruchu
             if (command.length() > 1 && java.lang.Character.isDigit(command.charAt(0))) {
-                steps = java.lang.Character.getNumericValue(command.charAt(0));
-                moveDir = command.charAt(1);
+                steps = java.lang.Character.getNumericValue(command.charAt(0)); // Pobiera liczbę kroków
+                moveDir = command.charAt(1); // Pobiera kierunek z komendy
             } else if (command.length() == 1 && "wasd".indexOf(command.charAt(0)) != -1) {
-                moveDir = command.charAt(0);
+                moveDir = command.charAt(0); // Ustawia kierunek ruchu dla jednoliterowej komendy
             } else {
                 System.out.println("Nieznana komenda!");
                 continue;
             }
 
-            int currentX = getPlayerX();
-            int currentY = getPlayerY();
-            int newX = currentX;
-            int newY = currentY;
-            boolean interrupted = false;
+            int currentX = getPlayerX(); // Pobiera aktualną pozycję X gracza
+            int currentY = getPlayerY(); // Pobiera aktualną pozycję Y gracza
+            int newX = currentX;         // Inicjalizuje nowe współrzędne X
+            int newY = currentY;         // Inicjalizuje nowe współrzędne Y
 
-            // Wykonujemy ruch krok po kroku
-            for (int i = 0; i < steps; i++) {
+            boolean interrupted = false; // Flaga do oznaczenia przerwania ruchu/interakcji
+
+            for (int i = 0; i < steps; i++) { // Iteruje przez liczbę kroków
                 switch (moveDir) {
-                    case 'w': newY--; break;
-                    case 's': newY++; break;
-                    case 'a': newX--; break;
-                    case 'd': newX++; break;
+                    case 'w': newY--; break; // Ruch w górę
+                    case 's': newY++; break; // Ruch w dół
+                    case 'a': newX--; break; // Ruch w lewo
+                    case 'd': newX++; break; // Ruch w prawo
                     default:
                         System.out.println("Nieznany kierunek!");
-                        interrupted = true;
+                        interrupted = true; // Ustawia przerwanie, gdy kierunek jest nieznany
                         break;
                 }
-                if (interrupted) break;
+                if (interrupted) break; // Przerywa, jeśli wystąpił problem z kierunkiem
 
-                // Sprawdzamy, czy nie wychodzimy poza granice mapy
+                // Sprawdzanie granic mapy
                 if (newX < 0 || newX >= mapWidth || newY < 0 || newY >= mapHeight) {
                     System.out.println("Nie możesz się tam ruszyć! Granica mapy.");
-                    newX = currentX;
-                    newY = currentY;
-                    interrupted = true;
+                    interrupted = true; // Przerywa ruch, jeśli wyszliśmy poza mapę
                     break;
                 }
 
-                // Jeśli trafiamy na wyjście 'X', kończymy grę
+                // Jeśli gracz wchodzi na wyjście 'X'
                 if (map[newY][newX] == 'X') {
                     System.out.println("Gratulacje! Wyszedłeś z lochu!");
                     scanner.close();
                     return;
                 }
 
-                // Jeśli napotkamy interaktywny element (przeciwnik, przedmiot, zagadka)
+                // Jeśli na nowym polu znajduje się interaktywny element
+                                   // Jeśli na nowym polu znajduje się interaktywny element
                 if (map[newY][newX] == 'E' || map[newY][newX] == 'I' || map[newY][newX] == '?') {
-                    encounterManager.handleEncounter(map[newY][newX], player, map, newX, newY);
-                    interrupted = true;
-                    break;
+                    encounterManager.handleEncounter(map[newY][newX], player, map, newX, newY); // Obsługa interakcji
+                    map[newY][newX] = 'P'; // Gracz przejmuje miejsce interakcji
+                    map[currentY][currentX] = '.'; // Poprzednia pozycja gracza staje się pusta
+                    currentX = newX; // Aktualizuje bieżące X gracza na nowe
+                    currentY = newY; // Aktualizuje bieżące Y gracza na nowe
+                    interrupted = true; // Przerywa dalszy ruch po interakcji
+                    break; // Kończy pętlę kroków po interakcji
                 }
             }
 
-            // Jeżeli ruch nie został przerwany, aktualizujemy pozycję gracza
+            // Jeśli ruch nie został przerwany, gracz przechodzi na nowe pole
             if (!interrupted) {
-                map[currentY][currentX] = '.';
-                map[newY][newX] = 'P';
+                map[currentY][currentX] = '.'; // Oznacza stare pole jako puste
+                map[newY][newX] = 'P';         // Ustawia gracza na nowej pozycji
             }
 
-            // Jeżeli zdrowie gracza spadło do zera, kończymy grę
+            // Sprawdzanie, czy gracz przegrał (zdrowie <= 0)
             if (player.isGameOver()) {
                 System.out.println("Przegrałeś!");
                 scanner.close();
                 return;
             }
         }
-    }
-}
+    } // Zamknięcie metody startGame
+
+} // Zamknięcie klasy GameManager
