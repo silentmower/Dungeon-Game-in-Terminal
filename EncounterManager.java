@@ -47,17 +47,17 @@ public class EncounterManager {
 
     // Metoda symulująca walkę z przeciwnikiem
     private void fightEnemy(Player player) {
-        Random random = new Random();  // Tworzy obiekt Random do losowania obrażeń
-        // Losuje obrażenia w zakresie ustawionym w DifficultySettings, np. między minDamage a maxDamage
+        Random random = new Random(); // Tworzy obiekt Random do losowania obrażeń
         int damage = random.nextInt(settings.getMaxDamage() - settings.getMinDamage() + 1) + settings.getMinDamage();
-        System.out.println("Przeciwnik zadaje Ci " + damage + " obrażeń!");
-        player.takeDamage(damage);  // Zadaje graczowi obrażenia
-        // Jeśli gracz nadal żyje, przyznaje punkty doświadczenia
+        System.out.println("Przeciwnik zadaje Ci " + damage + " obrażeń!"); // Informacja o zadanych obrażeniach
+        player.takeDamage(damage); // Zadaje obrażenia graczowi
+
+        // Jeśli gracz przeżyje, przyznaje XP i wyświetla tylko jeden komunikat
         if (player.getHealth() > 0) {
-            System.out.println("Pokonałeś przeciwnika! Zdobywasz " + settings.getEnemyXp() + " punktów XP.");
-            player.gainXp(settings.getEnemyXp());
+            player.gainXp(settings.getEnemyXp()); // Przyznaje doświadczenie graczowi
         }
     }
+
 
     // Metoda rozwiązująca zagadkę – prosta matematyczna zagadka
     private void solvePuzzle(Player player) {
