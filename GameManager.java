@@ -124,7 +124,7 @@ public class GameManager {
         return -1;
     }
 
-    // Główna pętla gry
+    // Główna pętla 
     public void startGame() {
         Scanner scanner = new Scanner(System.in);
         while (true) {
