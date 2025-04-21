@@ -20,3 +20,4 @@ public abstract class Armor extends Item {
         System.out.println(player.getName() + " wyposażył " + name + ", która blokuje " + damageBlockPercentage + "% obrażeń.");
     }
 }
+
