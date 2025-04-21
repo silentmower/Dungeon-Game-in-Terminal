@@ -31,6 +31,7 @@ public class GameManager {
         mapWidth = size;
         mapHeight = size;
 
+        
         // WYBÓR POZIOMU TRUDNOŚCI:
         System.out.println("Wybierz poziom trudności (1 – Łatwy, 2 – Średni, 3 – Trudny):");
         int diffChoice = 2;
