@@ -19,7 +19,6 @@ public class Player extends Character {
         return xp;
     }
 
-    
     // Dodaje zdobyte doświadczenie i wypisuje informację o zdobyciu XP
     public void gainXp(int amount) {
         xp += amount;
