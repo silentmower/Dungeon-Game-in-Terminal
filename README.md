@@ -1,59 +1,114 @@
-Dungeon Adventure
-Dungeon Adventure is a simple adventure game written in Java in which the player explores dungeons, encounters enemies, collects items (health potions and armor), and solves puzzles. The project serves as a demonstration of modular programming, object-oriented design, inheritance, and the use of randomization.
-Features
-Map Generation: A randomly generated square map where different tiles are assigned as follows:
-10% of the tiles contain items (health potions or armor),
-10% contain enemies,
-10% contain puzzles,
-The remaining 70% are empty spaces.
-Enemies: Engage in battles with enemies that inflict damage, allowing the player to gain experience points (XP) if they survive.
-Items: Random item drops include various health potions (Small, Medium, Large) and different types of armor (Rusty, Gold, Godness). The drop chance is randomized to give a varied gameplay experience.
-Puzzles: Solve simple math puzzles to earn XP. Incorrect answers may result in penalties, such as a loss of health.
-Difficulty Settings: The game allows configuration of game parameters (damage range, XP awards, etc.) based on the selected difficulty level.
-Project Structure
-The project is organized into the following packages:
-character Contains character-related classes:
-Character.java – An abstract class defining shared behaviors,
-Player.java – Represents the player (with an inventory, XP management, etc.),
-Enemy.java – Represents enemy characters.
-game Contains game management and logic classes:
-GameManager.java – The main controller that manages the game loop, player movement, and the map,
-EncounterManager.java – Manages encounters between the player and map elements (enemies, items, puzzles, exit),
-DifficultySettings.java – Manages the configuration of game difficulty settings,
-Entity.java – A base class for all entities (from which characters and items derive).
-items Contains item-related classes:
-Item.java – An abstract class for game items,
-Subpackage items.armor:
-Armor.java – An abstract class for armor items,
-RustyArmor.java, GoldArmor.java, GodnessArmor.java – Concrete armor types.
-Subpackage items.potion:
-Potion.java – An abstract class for health potions,
-SmallHealthPotion.java, MediumHealthPotion.java, LargeHealthPotion.java – Concrete types of potions.
-main Contains:
-Main.java – The entry point for the application that launches the game.
-Requirements
-Java: The project is written in Java (Java 11 or later is recommended).
-IDE: You can use IntelliJ IDEA, Eclipse, or any other preferred Java development environment.
-Compilation: Ensure that the src folder is marked as the Sources Root in your IDE.
-Installation and Execution
-Download the Project: Clone or download the project files from the repository.
-Open the Project: Open the project in your IDE, ensuring that the folder structure is preserved.
-Configure the Sources Root: Mark the src folder as your Sources Root (in IntelliJ IDEA: right-click on src → Mark Directory as > Sources Root).
-Build the Project: Use your IDE’s build functionality (e.g., Build > Rebuild Project in IntelliJ IDEA) to compile the project.
-Run the Application: Execute the Main.java file located in the main package.
-How to Play
-Movement: Use keys such as w, s, a, d (or commands like 2w for moving two spaces) to navigate through the map.
-Interactions: The game automatically processes interactions based on the type of tile encountered:
-E: Engage in a fight with an enemy.
-I: Receive a random item drop (either a health potion or armor).
-?: Solve a math puzzle.
-X: Exit the dungeon.
-Inventory: Press i to view the current inventory of the player.
-Quit: Type q to exit the game.
-Future Enhancements
-Expand the inventory system to allow using items during combat.
-Introduce additional types of enemies and more complex combat mechanics.
-Enhance interactions and puzzles for a richer gameplay experience.
-Implement a save/load system to retain game progress.
-Reporting Issues
-If you encounter any issues or have suggestions for improvements, please feel free to report them or contact the project maintainers.
+# Dungeon Adventure
+
+**Dungeon Adventure** is a simple adventure game written in Java, where the player explores dungeons, battles enemies, collects items (health potions and armor), and solves puzzles. This project demonstrates modular programming, object-oriented design, inheritance, and randomization concepts.
+
+## Features
+
+- **Map Generation:**  
+  A randomly generated square map with different tile types:
+  - 10% of the tiles contain items (health potions or armor)
+  - 10% of the tiles contain enemies
+  - 10% of the tiles contain puzzles
+  - The remaining 70% are empty spaces
+
+- **Enemies:**  
+  Fight enemies that cause damage. If the player survives, they gain experience points (XP).
+
+- **Items:**  
+  Randomly receive health potions (Small, Medium, or Large) or various types of armor (Rusty, Gold, or Godness). The item drop is determined randomly.
+
+- **Puzzles:**  
+  Solve simple math puzzles to earn XP. Incorrect answers incur penalties, such as lost health.
+
+- **Difficulty Settings:**  
+  The game can be configured for different difficulty levels, affecting the damage range and XP rewards.
+
+## Project Structure
+
+- **`character`**  
+  Contains character-related classes:
+  - `Character.java` – Abstract class defining common behaviors
+  - `Player.java` – Represents the player (with inventory, XP management, and more)
+  - `Enemy.java` – Represents enemies
+
+- **`game`**  
+  Contains game management and logic classes:
+  - `GameManager.java` – The primary controller managing game flow, player movement, and the map
+  - `EncounterManager.java` – Manages player interactions with map elements (enemies, items, puzzles, exits)
+  - `DifficultySettings.java` – Stores and configures game difficulty parameters
+  - `Entity.java` – Base class for all entities (characters, items, etc.)
+
+- **`items`**  
+  Contains item-related classes:
+  - `Item.java` – Abstract class for items
+  - **Subpackage `items.armor`:**
+    - `Armor.java` – Abstract class for armor
+    - `RustyArmor.java`, `GoldArmor.java`, `GodnessArmor.java` – Concrete armor types
+  - **Subpackage `items.potion`:**
+    - `Potion.java` – Abstract class for health potions
+    - `SmallHealthPotion.java`, `MediumHealthPotion.java`, `LargeHealthPotion.java` – Concrete health potion classes
+
+- **`main`**  
+  Contains:
+  - `Main.java` – The entry point to the application that starts the game
+
+## Requirements
+
+- **Java:**  
+  The project is built with Java (version 11 or newer is recommended).
+
+- **IDE:**  
+  Use IntelliJ IDEA, Eclipse, or your preferred Java development environment.
+
+- **Compilation:**  
+  Ensure the `src` directory is marked as the Sources Root in your IDE.
+
+## Installation and Running the Application
+
+1. **Clone or Download the Project:**  
+   Clone this repository or download the project files.
+
+2. **Open the Project:**  
+   Open the project in your IDE while preserving the folder structure.
+
+3. **Configure the Sources Root:**  
+   Mark the `src` folder as your Sources Root (in IntelliJ IDEA: right-click on `src` → **Mark Directory as > Sources Root**).
+
+4. **Build the Project:**  
+   Use the build functionality (e.g., **Build > Rebuild Project** in IntelliJ IDEA) to compile the project.
+
+5. **Run the Application:**  
+   Execute `Main.java` located in the `main` package to launch the game.
+
+## How to Play
+
+- **Movement:**  
+  Use keys such as `w`, `s`, `a`, `d` (or commands like `2w` for moving two steps) to navigate the map.
+
+- **Interactions:**  
+  The game automatically processes interactions based on the tile type:
+  - **E:** Engage in combat with an enemy.
+  - **I:** Receive a random item drop (health potion or armor).
+  - **?:** Solve a math puzzle.
+  - **X:** Exit the dungeon.
+
+- **Inventory:**  
+  Press `i` to view the player's current inventory.
+
+- **Quit:**  
+  Type `q` to exit the game.
+
+## Future Enhancements
+
+- Expand the inventory system to allow item usage during combat.
+- Introduce additional enemy types and more advanced combat mechanics.
+- Add more interactive puzzles and richer gameplay experiences.
+- Implement save/load functionality to maintain game progress.
+
+## Reporting Issues
+
+If you encounter any issues or have suggestions for improvements, please create an issue or contact the project maintainers.
+
+---
+
+Feel free to explore the code and contribute to further development!
