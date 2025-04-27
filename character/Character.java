@@ -1,12 +1,12 @@
-package character; // Deklaracja pakietu
+package character;
 
-import game.Entity; // Import klasy Entity z pakietu game
+import game.Entity;
 
 public abstract class Character extends Entity {
     protected int health;
 
     public Character(String id, String name, int health) {
-        super(id, name); // Wywołanie konstruktora Entity
+        super(id, name);
         this.health = health;
     }
 

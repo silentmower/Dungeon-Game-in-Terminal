@@ -1,4 +1,4 @@
-package character; // Deklaracja pakietu
+package character;
 
 import game.Entity;
 
