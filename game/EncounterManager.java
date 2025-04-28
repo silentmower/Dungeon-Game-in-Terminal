@@ -10,7 +10,6 @@ import item.armor.GodnessArmor;
 import java.util.Random;
 import java.util.Scanner;
 
-
 public class EncounterManager {
     private DifficultySettings settings;
 
