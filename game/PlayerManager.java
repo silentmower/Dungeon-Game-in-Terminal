@@ -1,7 +1,6 @@
 import java.util.ArrayList;
 import item.Item;
 
-
 public class PlayerManager {
     private int health;
     private int xp;
