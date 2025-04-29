@@ -12,6 +12,7 @@ import java.util.Scanner;
 
 
 
+
 public class GameManager {
     private char[][] map;
     private int mapWidth;
