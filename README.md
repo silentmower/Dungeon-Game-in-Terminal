@@ -4,7 +4,6 @@
 
 ## Features
 
-
 - **Map Generation:**  
   A randomly generated square map with different tile types:
   - 10% of the tiles contain items (health potions or armor)
